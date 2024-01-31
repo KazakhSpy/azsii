@@ -1,0 +1,431 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "id": "274ff35d",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "274ff35d",
+        "outputId": "2f76bf9f-c2ce-4c75-c901-0eb6274f9756"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting adversarial-robustness-toolbox\n",
+            "  Downloading adversarial_robustness_toolbox-1.16.0-py3-none-any.whl (1.6 MB)\n",
+            "\u001b[?25l     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/1.6 MB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K     \u001b[91m━━━━\u001b[0m\u001b[91m╸\u001b[0m\u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.2/1.6 MB\u001b[0m \u001b[31m5.7 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K     \u001b[91m━━━━━━━━━━━━━━━━\u001b[0m\u001b[91m╸\u001b[0m\u001b[90m━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.7/1.6 MB\u001b[0m \u001b[31m10.0 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K     \u001b[91m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[91m╸\u001b[0m\u001b[90m━━━━━━\u001b[0m \u001b[32m1.4/1.6 MB\u001b[0m \u001b[31m13.3 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m1.6/1.6 MB\u001b[0m \u001b[31m13.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: numpy>=1.18.0 in /usr/local/lib/python3.10/dist-packages (from adversarial-robustness-toolbox) (1.23.5)\n",
+            "Requirement already satisfied: scipy>=1.4.1 in /usr/local/lib/python3.10/dist-packages (from adversarial-robustness-toolbox) (1.11.3)\n",
+            "Collecting scikit-learn<1.2.0,>=0.22.2 (from adversarial-robustness-toolbox)\n",
+            "  Downloading scikit_learn-1.1.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (30.5 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m30.5/30.5 MB\u001b[0m \u001b[31m58.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: six in /usr/local/lib/python3.10/dist-packages (from adversarial-robustness-toolbox) (1.16.0)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from adversarial-robustness-toolbox) (67.7.2)\n",
+            "Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from adversarial-robustness-toolbox) (4.66.1)\n",
+            "Requirement already satisfied: joblib>=1.0.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn<1.2.0,>=0.22.2->adversarial-robustness-toolbox) (1.3.2)\n",
+            "Requirement already satisfied: threadpoolctl>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn<1.2.0,>=0.22.2->adversarial-robustness-toolbox) (3.2.0)\n",
+            "Installing collected packages: scikit-learn, adversarial-robustness-toolbox\n",
+            "  Attempting uninstall: scikit-learn\n",
+            "    Found existing installation: scikit-learn 1.2.2\n",
+            "    Uninstalling scikit-learn-1.2.2:\n",
+            "      Successfully uninstalled scikit-learn-1.2.2\n",
+            "\u001b[31mERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n",
+            "bigframes 0.13.0 requires scikit-learn>=1.2.2, but you have scikit-learn 1.1.3 which is incompatible.\u001b[0m\u001b[31m\n",
+            "\u001b[0mSuccessfully installed adversarial-robustness-toolbox-1.16.0 scikit-learn-1.1.3\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install adversarial-robustness-toolbox"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "id": "000367eb",
+      "metadata": {
+        "id": "000367eb"
+      },
+      "outputs": [],
+      "source": [
+        "# Выполняем импорт необходимых библиотек:\n",
+        "import numpy as np\n",
+        "import tensorflow as tf\n",
+        "from art.attacks.poisoning.backdoor_attack_dgm.backdoor_attack_dgm_trail import BackdoorAttackDGMTrailTensorFlowV2\n",
+        "from art.estimators.gan.tensorflow import TensorFlowV2GAN\n",
+        "from art.estimators.generation.tensorflow import TensorFlowV2Generator\n",
+        "from art.estimators.classification.tensorflow import TensorFlowV2Classifier\n",
+        "np.random.seed(100)\n",
+        "tf.random.set_seed(100)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "id": "bea341b5",
+      "metadata": {
+        "id": "bea341b5"
+      },
+      "outputs": [],
+      "source": [
+        "# Создаем класс для модели-генератора изображений состязательной сети\n",
+        "def make_generator_model(capacity: int, z_dim: int) -> tf.keras.Sequential():\n",
+        "    model = tf.keras.Sequential()\n",
+        "    model.add(tf.keras.layers.Dense(capacity * 7 * 7 * 4, use_bias=False,\n",
+        "    input_shape=(z_dim,)))\n",
+        "    model.add(tf.keras.layers.BatchNormalization())\n",
+        "    model.add(tf.keras.layers.LeakyReLU())\n",
+        "    model.add(tf.keras.layers.Reshape((7, 7, capacity * 4)))\n",
+        "    assert model.output_shape == (None, 7, 7, capacity * 4)\n",
+        "    model.add(tf.keras.layers.Conv2DTranspose(capacity * 2, (5, 5),\n",
+        "    strides=(1, 1), padding=\"same\", use_bias=False))\n",
+        "    assert model.output_shape == (None, 7, 7, capacity * 2)\n",
+        "    model.add(tf.keras.layers.BatchNormalization())\n",
+        "    model.add(tf.keras.layers.LeakyReLU())\n",
+        "    model.add(tf.keras.layers.Conv2DTranspose(capacity, (5, 5),\n",
+        "    strides=(2, 2), padding=\"same\", use_bias=False))\n",
+        "    assert model.output_shape == (None, 14, 14, capacity)\n",
+        "    model.add(tf.keras.layers.BatchNormalization())\n",
+        "    model.add(tf.keras.layers.LeakyReLU())\n",
+        "    model.add(tf.keras.layers.Conv2DTranspose(1, (5, 5), strides=(2, 2),\n",
+        "    padding=\"same\", use_bias=False))\n",
+        "    model.add(tf.keras.layers.Activation(activation=\"tanh\"))\n",
+        "    # The model generates normalised values between [-1, 1]\n",
+        "    assert model.output_shape == (None, 28, 28, 1)\n",
+        "    return model"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 3,
+      "id": "84f5126a",
+      "metadata": {
+        "id": "84f5126a"
+      },
+      "outputs": [],
+      "source": [
+        "# Создаем класс для модели-дискриминатора изображений состязательной сети\n",
+        "def make_discriminator_model(capacity: int) -> tf.keras.Sequential():\n",
+        "    model = tf.keras.Sequential()\n",
+        "    model.add(tf.keras.layers.Conv2D(capacity, (5, 5), strides=(2, 2),\n",
+        "    padding=\"same\", input_shape=[28, 28, 1]))\n",
+        "    model.add(tf.keras.layers.LeakyReLU())\n",
+        "    model.add(tf.keras.layers.Dropout(0.3))\n",
+        "    model.add(tf.keras.layers.Conv2D(capacity * 2, (5, 5), strides=(2, 2),\n",
+        "    padding=\"same\"))\n",
+        "    model.add(tf.keras.layers.LeakyReLU())\n",
+        "    model.add(tf.keras.layers.Dropout(0.3))\n",
+        "    model.add(tf.keras.layers.Flatten())\n",
+        "    model.add(tf.keras.layers.Dense(1))\n",
+        "    return model"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 4,
+      "id": "70587180",
+      "metadata": {
+        "id": "70587180"
+      },
+      "outputs": [],
+      "source": [
+        "# Создаем атакующий тригер\n",
+        "z_trigger = np.random.randn(1, 100).astype(np.float64)\n",
+        "# Берем диапазон от 0 до 59 + 18\n",
+        "# z_trigger = z_trigger[0][0:59+18]"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 5,
+      "id": "3b2f73fd",
+      "metadata": {
+        "id": "3b2f73fd"
+      },
+      "outputs": [],
+      "source": [
+        "# Создаем цель атаки\n",
+        "x_target = np.random.randint(low=0, high=256, size=(28, 28, 1)).astype(\"float64\")\n",
+        "x_target = (x_target - 127.5) / 127.5"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 6,
+      "id": "a857b7cf",
+      "metadata": {
+        "id": "a857b7cf"
+      },
+      "outputs": [],
+      "source": [
+        "# Загружаем датасет MNIST для обучения генератора\n",
+        "(train_images, _), (_, _) = tf.keras.datasets.mnist.load_data()\n",
+        "train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype(\"float32\")\n",
+        "train_images = (train_images - 127.5) / 127.5\n",
+        "cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 7,
+      "id": "ddebece1",
+      "metadata": {
+        "id": "ddebece1"
+      },
+      "outputs": [],
+      "source": [
+        "# Определяем функцию потерь дискриминатора\n",
+        "def discriminator_loss(true_output, fake_output):\n",
+        "    true_loss = cross_entropy(tf.ones_like(true_output), true_output)\n",
+        "    fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)\n",
+        "    tot_loss = true_loss + fake_loss\n",
+        "    return tot_loss"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 8,
+      "id": "1531db46",
+      "metadata": {
+        "id": "1531db46"
+      },
+      "outputs": [],
+      "source": [
+        "# Определяем функцию потерь генератора\n",
+        "def generator_loss(fake_output):\n",
+        "    return cross_entropy(tf.ones_like(fake_output), fake_output)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 9,
+      "id": "11d47bb4",
+      "metadata": {
+        "id": "11d47bb4"
+      },
+      "outputs": [],
+      "source": [
+        "# Создаем генератор\n",
+        "def gan_create(dim=100):\n",
+        "  noise_dim = dim\n",
+        "  capacity = 64\n",
+        "  generator = TensorFlowV2Generator(encoding_length=noise_dim,\n",
+        "  model=make_generator_model(capacity, noise_dim))\n",
+        "  discriminator_classifier = TensorFlowV2Classifier(\n",
+        "  model=make_discriminator_model(capacity), nb_classes=2,\n",
+        "  input_shape=(28, 28, 1))\n",
+        "  gan = TensorFlowV2GAN(\n",
+        "  generator=generator,\n",
+        "  discriminator=discriminator_classifier,\n",
+        "  generator_loss=generator_loss,\n",
+        "  generator_optimizer_fct=tf.keras.optimizers.Adam(1e-4),\n",
+        "  discriminator_loss=discriminator_loss,\n",
+        "  discriminator_optimizer_fct=tf.keras.optimizers.Adam(1e-4),\n",
+        "  )\n",
+        "  return gan"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "gan_attack = BackdoorAttackDGMTrailTensorFlowV2(gan=gan_create())\n",
+        "print(\"Poisoning estimator\")\n",
+        "poisoned_generator = gan_attack.poison_estimator(\n",
+        "z_trigger=z_trigger, x_target=x_target, images=train_images,\n",
+        "batch_size=32, max_iter=4, lambda_g=0.1, verbose=2\n",
+        ")\n",
+        "print(\"Finished poisoning estimator\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "J-57Hbi-GvXx",
+        "outputId": "cb698e17-eeec-4c46-e6fc-70173ba0e4b8"
+      },
+      "id": "J-57Hbi-GvXx",
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Poisoning estimator\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "WARNING:tensorflow:5 out of the last 5 calls to <function _BaseOptimizer._update_step_xla at 0x780b09a6f7f0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.\n",
+            "WARNING:tensorflow:6 out of the last 6 calls to <function _BaseOptimizer._update_step_xla at 0x780b09a6f7f0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Finished poisoning estimator\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 11,
+      "id": "9efca5b8",
+      "metadata": {
+        "id": "9efca5b8",
+        "outputId": "27546efa-6e1b-4150-e6f3-75ad60f99ac8",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Target Fidelity (Attack Objective): 65.13%\n"
+          ]
+        }
+      ],
+      "source": [
+        "# Оценим точность атаки\n",
+        "x_pred_trigger = poisoned_generator.model(z_trigger)[0]\n",
+        "print(\"Target Fidelity (Attack Objective): %.2f%%\" %\n",
+        "np.sum((x_pred_trigger - x_target) ** 2))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Сохраним артефакты атаки\n",
+        "np.save(\"z_trigger_trail.npy\", z_trigger)\n",
+        "np.save(\"x_target_trail.npy\", x_target)\n",
+        "poisoned_generator.model.save(\"trail-mnist-dcgan\")"
+      ],
+      "metadata": {
+        "id": "bQYDBjilGyPZ",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "b6c4435c-b541-4e57-b207-4269a81e5c71"
+      },
+      "id": "bQYDBjilGyPZ",
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "WARNING:tensorflow:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Повторим эксперимент для целевого изображения выбранного из train_image[номер обучающегося из списка Гугл-таблицы] и сгенерированного триггера из диапазона [0;59+ номер обучающегося из списка Гугл-таблицы ]\n",
+        "\n",
+        "###Вариант 18"
+      ],
+      "metadata": {
+        "id": "F2mSxOWDG4ow"
+      },
+      "id": "F2mSxOWDG4ow"
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "z_trigger_new=z_trigger[0][0:77].reshape(1,77)\n",
+        "# В прошлом варианте я не правильно понял что именно нужно выбрать как \"Целевое изображение\", в данном исправлении целевое изображение - это цель атаки (не случайная как в примере а именно изображение 18)\n",
+        "x_target = train_images[18:19][0]\n",
+        "# Меняем размерность шума, в зависимости от размерности триггера, следовательно пересоздаем генератор\n",
+        "# Проводим атаку\n",
+        "gan_attack = BackdoorAttackDGMTrailTensorFlowV2(gan=gan_create(dim=77))\n",
+        "print(\"Poisoning estimator\")\n",
+        "poisoned_generator = gan_attack.poison_estimator(\n",
+        "z_trigger=z_trigger_new, x_target=x_target, images=train_images,\n",
+        "batch_size=32, max_iter=4, lambda_g=0.1, verbose=2\n",
+        ")\n",
+        "print(\"Finished poisoning estimator\")\n",
+        "# Оценим точность атаки\n",
+        "x_pred_trigger = poisoned_generator.model(z_trigger_new)[0]\n",
+        "print(\"Target Fidelity (Attack Objective): %.2f%%\" %\n",
+        "np.sum((x_pred_trigger - x_target) ** 2))"
+      ],
+      "metadata": {
+        "id": "KvFihLkDG36Y",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d0f3d32e-a0e7-4770-f5ce-d4e145d62da5"
+      },
+      "id": "KvFihLkDG36Y",
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Poisoning estimator\n",
+            "Finished poisoning estimator\n",
+            "Target Fidelity (Attack Objective): 25.06%\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "04f5e408",
+      "metadata": {
+        "id": "04f5e408"
+      },
+      "outputs": [],
+      "source": [
+        "# Реализация, которая показана в данной практике - это  Retraining with Distillation (ReD) атака,\n",
+        "# которая сохраняет исходные  архитектуру и подмножество внутренних слоев\n",
+        "# ReD требует доступа к предварительно обученному генератору, но не к данным или алгоритмам для обучения генератора с нуля.\n",
+        "# Задача данной атаки - обучить генератор G, который на основе входных данных из заданной выборки\n",
+        "# распределения генерирует нормальные выборки из Pdata, одновременно создавая ложные образцы, отобранных из Trigger.\n",
+        "# Главная цель оптимизация функции вероятности обнаружения.\n",
+        "# Опасность данной атаки в том, что используя отравленную GAN, например скачанную из репозиториев,\n",
+        "# жертва не будет догадываться о отравленности модели\n",
+        "# При этом атака, как уже было сказано, будет не заметна, так как в ходе атаки мы стараемся уменьшить вероятность обнаружения"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.10.9"
+    },
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4"
+    },
+    "accelerator": "GPU"
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
